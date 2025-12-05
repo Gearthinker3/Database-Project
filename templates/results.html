@@ -1,0 +1,12 @@
+<tr>
+    <th>College</th>
+    <th>Major</th>
+    <th>State</th>
+</tr>
+{% for row in results %}
+<tr>
+    <td>{{ row[0] }}</td>
+    <td>{{ row[1] }}</td>
+    <td>{{ row[2] }}</td>
+</tr>
+{% endfor %}

@@ -48,14 +48,16 @@ def search():
         cur.execute("SET search_path TO jett_morrandez;")
 
         query = """
-            SELECT s.Major, s.startingmediansalary, i.INSTNM
+            SELECT DISTINCT s.Major, 
+            (s.startingmediansalary * 10 - COALESCE(i.costt4_a, 0)*4) AS roi, i.costt4_a,
+            i.INSTNM
             FROM programs p
             JOIN degree_to_salary s ON p.majorid = s.majorid
             JOIN institutions i ON p.UNITID = i.UNITID
             WHERE i.STABBR = %s
-              AND s.Major = %s
-              AND p.CREDDESC = 'Bachelor''s Degree'
-            ORDER BY s.startingmediansalary DESC;
+                AND s.Major = %s
+                AND p.CREDDESC = 'Bachelor''s Degree'
+            ORDER BY roi DESC;
         """
 
         cur.execute(query, (state, major))
@@ -69,7 +71,12 @@ def search():
     except Exception as e:
         return f"Error: {e}"
 
-
+@app.route('/logout')
+def logout():
+    # Clear all session data
+    session.clear()
+    # Redirect to the home/login page
+    return redirect(url_for('home'))
 
 
 if __name__ == '__main__':

@@ -10,7 +10,7 @@
         <label for="state">State (2-letter code):</label>
         <input type="text" id="state" name="state" maxlength="2" required>
         <br><br>
-        
+
         <label for="major">Major:</label>
         <select id="major" name="major" required>
             <option value="" disabled selected>Select a major</option>
@@ -69,5 +69,11 @@
 
         <button type="submit">Search</button>
     </form>
+
+    <br><br>
+    <form action="{{ url_for('logout') }}" method="get" style="display:inline;">
+        <button type="submit">Logout</button>
+    </form>
+
 </body>
 </html>

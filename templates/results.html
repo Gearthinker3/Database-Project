@@ -29,12 +29,17 @@
 <body>
 
 <h2>Search Results: {{ results|length }} programs found</h2>
+<form action="{{ url_for('search') }}" method="get">
+    <button type="submit">New Search</button>
+</form>
+<br><br>
 
 <table>
     <thead>
         <tr>
             <th>Major</th>
-            <th>Starting Median Salary</th>
+            <th>Return on Investment (over 10 years)</th>
+            <th>Estimated Cost of Attendance (1 year)</th>
             <th>College</th>
         </tr>
     </thead>
@@ -43,13 +48,14 @@
         <tr>
             <td>{{ row[0] }}</td>
             <td>${{ "{:,}".format(row[1]) }}</td>
-            <td>{{ row[2] }}</td>
+            <td>${{ "{:,}".format(row[2] or 0) }}</td>
+            <td>{{ row[3] }}</td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
 
-<h3>Salary Distribution by Institution</h3>
+<h3>ROI Distribution by Institution</h3>
 <canvas id="resultsChart" width="400" height="200"></canvas>
 
 <h3>Sunburst Chart: Major Categories by Salary Range in {{ state }}</h3>
@@ -65,7 +71,7 @@
         data: {
             labels: chartLabels,
             datasets: [{
-                label: 'Starting Median Salary ($)',
+                label: 'Return on Investment ($)',
                 data: chartValues,
                 backgroundColor: 'rgba(54, 162, 235, 0.6)'
             }]
@@ -74,7 +80,7 @@
             responsive: true,
             scales: {
                 x: { title: { display: true, text: 'Institution' }},
-                y: { title: { display: true, text: 'Starting Salary ($)' }}
+                y: { title: { display: true, text: 'ROI ($)' }}
             }
         }
     });
@@ -99,6 +105,11 @@
         font: {size: 12}
     });
 </script>
+
+<br><br>
+<form action="{{ url_for('logout') }}" method="get" style="display:inline;">
+    <button type="submit">Logout</button>
+</form>
 
 </body>
 </html>

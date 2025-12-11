@@ -47,6 +47,7 @@ def search():
 
         cur.execute("SET search_path TO jett_morrandez;")
 
+        # Main query for results table
         query = """
             SELECT s.Major, s.startingmediansalary, i.INSTNM
             FROM programs p
@@ -57,15 +58,42 @@ def search():
               AND p.CREDDESC = 'Bachelor''s Degree'
             ORDER BY s.startingmediansalary DESC;
         """
-
         cur.execute(query, (state, major))
         results = cur.fetchall()
+
+        # Data for sunburst chart - salary ranges by major
+        sunburst_query = """
+            SELECT s.Major,
+                   CASE 
+                       WHEN s.startingmediansalary < 45000 THEN 'Low'
+                       WHEN s.startingmediansalary < 65000 THEN 'Medium' 
+                       ELSE 'High'
+                   END as salary_range,
+                   COUNT(*) as count
+            FROM programs p
+            JOIN degree_to_salary s ON p.majorid = s.majorid
+            JOIN institutions i ON p.UNITID = i.UNITID
+            WHERE i.STABBR = %s AND p.CREDDESC = 'Bachelor''s Degree'
+            GROUP BY s.Major, salary_range
+            ORDER BY s.Major;
+        """
+        cur.execute(sunburst_query, (state,))
+        sunburst_data = cur.fetchall()
+
+        chart_labels = [row[2] for row in results]  # Institution names
+        chart_values = [float(row[1]) if row[1] else 0 for row in results]
 
         cur.close()
         conn.close()
 
-        return render_template("results.html", results=results)
-
+        return render_template(
+            "results.html",
+            results=results,
+            chart_labels=chart_labels,
+            chart_values=chart_values,
+            sunburst_data=sunburst_data,
+            state=state
+        )
     except Exception as e:
         return f"Error: {e}"
 
